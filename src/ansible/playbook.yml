@@ -1,0 +1,32 @@
+- name: Setup Nginx Reverse Proxy
+  hosts: web
+  become: yes
+
+  tasks:
+    - name: Create nginx config
+      copy:
+        dest: /etc/nginx/sites-available/default
+        content: |
+          server {
+              listen 80;
+              server_name _;
+
+              location / {
+                  proxy_pass http://127.0.0.1:3000/;
+              }
+          }
+
+    - name: Test nginx config
+      command: nginx -t
+      register: nginx_test
+      ignore_errors: yes
+
+    - name: Fail if nginx config invalid
+      fail:
+        msg: "Nginx config invalid!"
+      when: nginx_test.rc != 0
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
