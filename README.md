@@ -137,8 +137,8 @@ func main() {
 
 | Field       | Tipe   | Keterangan                                              |
 | ----------- | ------ | ------------------------------------------------------- |
-| `nama`      | string | Nama peserta                                            |
-| `nrp`       | string | Nomor Registrasi Pokok peserta                          |
+| `nama`      | string | Nama Mahasiswa                                          |
+| `nrp`       | string | NRP Mahasiswa                                           |
 | `status`    | string | Status server, selalu `"UP"` selama server berjalan     |
 | `timestamp` | time   | Waktu saat request diterima                             |
 | `uptime`    | string | Durasi server telah berjalan sejak pertama kali distart |
