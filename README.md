@@ -18,14 +18,14 @@
 4. [Containerisasi dengan Docker](#4-containerisasi-dengan-docker)
 5. [Konfigurasi Ansible](#5-konfigurasi-ansible)
 6. [Pipeline CI/CD dengan GitHub Actions](#6-pipeline-cicd-dengan-github-actions)
-7. [Best Practices yang Diterapkan](#7-best-practices-yang-diterapkan)
-8. [Cara Menjalankan](#8-cara-menjalankan)
-9. [Hasil Akhir](#9-hasil-akhir)
-10. [Lampiran](#10-lampiran)
+7. [Cara Menjalankan](#8-cara-menjalankan)
+8. [Hasil Akhir](#9-hasil-akhir)
+9. [Lampiran](#10-lampiran)
+10. [Referensi](#10-referensi)
 
 ---
 
-## 1. Gambaran Umum
+## 1. Deskripsi
 
 Project ini mengimplementasikan modul CI/CD yang terdiri dari:
 
@@ -391,40 +391,7 @@ Secrets dikonfigurasi di **Settings → Secrets and variables → Actions** pada
 
 > **Catatan:** `GITHUB_TOKEN` tidak perlu didefinisikan secara manual — GitHub menyediakannya secara otomatis untuk setiap workflow run.
 
----
-
-## 7. Best Practices yang Diterapkan
-
-### Keamanan
-
-| Praktik                           | Implementasi                                                                |
-| --------------------------------- | --------------------------------------------------------------------------- |
-| **Tidak ada credential hardcode** | Semua secret (SSH key, PAT, IP VPS) disimpan di GitHub Secrets              |
-| **Container non-root**            | Dockerfile membuat `appuser` dan menjalankan aplikasi sebagai user tersebut |
-| **Multi-stage build**             | Source code dan toolchain Go tidak ikut terbawa ke image produksi           |
-| **Minimal attack surface**        | Image runtime menggunakan `alpine:3.19` yang sangat kecil                   |
-
-### Reliabilitas
-
-| Praktik                      | Implementasi                                                                                                          |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Validasi sebelum apply**   | Playbook Ansible menjalankan `nginx -t` sebelum restart — jika config salah, playbook gagal dan Nginx tidak terganggu |
-| **Zero-downtime deployment** | Container lama dihentikan hanya setelah image baru berhasil di-pull                                                   |
-| **Graceful error handling**  | `true` pada `docker stop/rm` mencegah kegagalan workflow jika container belum ada                                     |
-| **Job dependency**           | Job `deploy` hanya berjalan jika `build-and-push` sukses                                                              |
-
-### Maintainability
-
-| Praktik                    | Implementasi                                                                     |
-| -------------------------- | -------------------------------------------------------------------------------- |
-| **Versioned image tags**   | Setiap image di-tag dengan Git SHA, memungkinkan audit dan rollback              |
-| **Image cleanup**          | `docker image prune -f` membersihkan image lama otomatis setelah deploy          |
-| **Pinned Action versions** | Menggunakan versi spesifik (`@v4`, `@v3`) bukan `@latest` untuk reprodusibilitas |
-| **CORS restriction**       | API hanya mengizinkan metode GET pada endpoint `/health`                         |
-
----
-
-## 8. Cara Menjalankan
+## 7. Cara Menjalankan
 
 ### Prasyarat
 
@@ -481,7 +448,7 @@ Respons yang diharapkan:
 
 ---
 
-## 9. Hasil Akhir
+## 8. Hasil Akhir
 
 ### Alur Lengkap CI/CD
 
@@ -521,7 +488,7 @@ curl http://20.239.119.236/health → 200 OK ✅
 
 > API tidak dapat diakses langsung dari internet melalui port 3000 atau 8080 — hanya bisa diakses melalui Nginx di port 80, sesuai ketentuan soal yang melarang penggunaan port 80 dan 443 secara langsung untuk API.
 
-## 10. Lampiran
+## 9. Lampiran
 
 ### Verifikasi Endpoint `/health` via `curl`
 
@@ -546,3 +513,13 @@ curl http://20.239.119.236/health → 200 OK ✅
 > Menampilkan dua job (`build-and-push` dan `deploy`) yang keduanya selesai dengan status ✅, dipicu oleh push ke branch `main`.
 
 ![Tampilan GitHub Actions workflow yang berhasil](./media/gh_action.png)
+
+## 10. Referensi
+
+| link                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------- |
+| [Building API using GO](https://pkg.go.dev/net/http)                                                                          |
+| [Azure VPS Deployment](https://github.com/ncclaboratory18/LBE-NCC-2025)                                                       |
+| [GO Dockerize](https://docs.docker.com/guides/go-prometheus-monitoring/containerize/)                                         |
+| [Ansible Documentation](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_intro.html#playbook-syntax) |
+| [Github Actions Documentation](https://docs.github.com/en/actions/get-started/quickstart)                                     |
