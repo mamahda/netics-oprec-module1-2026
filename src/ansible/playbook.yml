@@ -3,6 +3,11 @@
   become: yes
 
   tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+
     - name: Create nginx config
       copy:
         dest: /etc/nginx/sites-available/default
